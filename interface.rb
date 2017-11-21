@@ -52,6 +52,14 @@ class Interface
   end
 
   def gerar_arquivo(commits_classificados, repositorio)
+    File.open("#{repositorio}_#{data_hora_f}.txt", 'w') do |file|
+      commits_classificados.each do |commit|
+        file.puts "#{commit['name']};#{commit['email']};#{commit['login']};#{commit['avatar_url']};#{commit['quantidade']}"
+      end
+    end
+  end
 
+  def data_hora_f
+    Time.now.strftime("%d-%m-%Y_%H-%M-%S")
   end
 end
