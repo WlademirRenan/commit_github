@@ -22,26 +22,33 @@ class Interface
   end
 
   def classificar_commits(result)
-    lista = Array.new
+    lista = Hash.new
     result.each do |commit|
-      puts commit['commit']['author']['name']
-      detalhes = Hash.new
-      detalhes['name']       = commit['commit']['author']['name']
-      detalhes['email']      = commit['commit']['author']['email']
-      detalhes['login']      = commit['author'].is_a?(Hash) ? commit['author']['login'] : nil
-      detalhes['avatar_url'] = commit['author'].is_a?(Hash) ? commit['author']['avatar_url'] : nil
-      
-      lista << detalhes
+      if lista[commit['commit']['author']['email']].is_a?(Hash)
+        detalhes = lista[commit['commit']['author']['email']]
+        detalhes['name']       ||= commit['commit']['author']['name']
+        detalhes['email']      ||= commit['commit']['author']['email']
+        detalhes['login']      ||= commit['author'].is_a?(Hash) ? commit['author']['login'] : nil
+        detalhes['avatar_url'] ||= commit['author'].is_a?(Hash) ? commit['author']['avatar_url'] : nil
+        detalhes['quantidade'] += 1
+        lista[commit['commit']['author']['email']] = detalhes
+      else
+        detalhes = Hash.new
+        detalhes['name']       = commit['commit']['author']['name']
+        detalhes['email']      = commit['commit']['author']['email']
+        detalhes['login']      = commit['author'].is_a?(Hash) ? commit['author']['login'] : nil
+        detalhes['avatar_url'] = commit['author'].is_a?(Hash) ? commit['author']['avatar_url'] : nil
+        detalhes['quantidade'] = 1
+        lista[commit['commit']['author']['email']] = detalhes
+      end
     end
-    lista
+    array = []
+    lista.each do |k,v|
+      array << v
+    end
 
-    #counts = Hash.new 0
-    
-    #words.each do |word|
-    #  counts[word] += 1
-    #end
-    
-  
+    array = array.sort_by{|commit| commit['quantidade']}.reverse
+    array
   end
 
   def gerar_arquivo(commits_classificados, repositorio)
