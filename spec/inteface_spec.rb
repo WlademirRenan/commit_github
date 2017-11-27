@@ -14,7 +14,7 @@ describe Interface do
     expect(data_hora_f).to eq Time.now.strftime('%d-%m-%Y_%H-%M')
   end
 
-  it 'deve retornar array' do
+  it 'deve retornar primeira linha igual a variavel @retorno' do
     retorno = @interface.http_get('WlademirRenan', 'sistema_base_adminlte_2016')
     expect(retorno.first).to eq @retorno
   end
