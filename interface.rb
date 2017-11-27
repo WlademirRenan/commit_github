@@ -1,8 +1,6 @@
 require 'net/http'
 require 'json'
-# name;email;login;avatar_url;commits_count
-# entrada https://github.com/Dinda-com-br/braspag-rest
-# saida  nomedoprojeto-datahora.txt
+
 class Interface
   def buscar_commits(url)
     url_separada = url.split('/')
@@ -15,31 +13,32 @@ class Interface
   end
 
   def http_get(user, repositorio)
-    # uri = URI('https://api.github.com/repos/WlademirRenan/sistema_base_adminlte_2016/commits')
     uri = URI("https://api.github.com/repos/#{user}/#{repositorio}/commits")
-    response =  Net::HTTP.get_response(uri)
+    response = Net::HTTP.get_response(uri)
     JSON.parse(response.body)
   end
 
   def classificar_commits(result)
     lista = Hash.new
     result.each do |commit|
-      if lista[commit['commit']['author']['email']].is_a?(Hash)
-        detalhes = lista[commit['commit']['author']['email']]
+      chave = commit['author'].is_a?(Hash) ? commit['author']['login'] : commit['commit']['author']['email']
+      if lista[chave].is_a?(Hash)
+        detalhes = lista[chave]
         detalhes['name']       ||= commit['commit']['author']['name']
-        detalhes['email']      ||= commit['commit']['author']['email']
+        detalhes['email']      << commit['commit']['author']['email']
         detalhes['login']      ||= commit['author'].is_a?(Hash) ? commit['author']['login'] : nil
         detalhes['avatar_url'] ||= commit['author'].is_a?(Hash) ? commit['author']['avatar_url'] : nil
         detalhes['quantidade'] += 1
-        lista[commit['commit']['author']['email']] = detalhes
+        lista[chave] = detalhes
       else
         detalhes = Hash.new
         detalhes['name']       = commit['commit']['author']['name']
-        detalhes['email']      = commit['commit']['author']['email']
+        detalhes['email']      = []
+        detalhes['email']      << commit['commit']['author']['email']
         detalhes['login']      = commit['author'].is_a?(Hash) ? commit['author']['login'] : nil
         detalhes['avatar_url'] = commit['author'].is_a?(Hash) ? commit['author']['avatar_url'] : nil
         detalhes['quantidade'] = 1
-        lista[commit['commit']['author']['email']] = detalhes
+        lista[chave] = detalhes
       end
     end
     array = []
@@ -54,7 +53,7 @@ class Interface
   def gerar_arquivo(commits_classificados, repositorio)
     File.open("arquivos/#{repositorio}_#{data_hora_f}.txt", 'w') do |file|
       commits_classificados.each do |commit|
-        file.puts "#{commit['name']};#{commit['email']};#{commit['login']};#{commit['avatar_url']};#{commit['quantidade']}"
+        file.puts "#{commit['name']};#{commit['email'].uniq.join(',')};#{commit['login']};#{commit['avatar_url']};#{commit['quantidade']}"
       end
     end
   end

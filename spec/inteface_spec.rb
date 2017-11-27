@@ -22,11 +22,11 @@ describe Interface do
   it 'deve retornar commits_classificados' do
     conteudo = [@retorno, @retorno]
     retorno = @interface.classificar_commits(conteudo)
-    expect(retorno).to eq [{"name"=>"Wlademir Renan dos Santos", "email"=>"wlademir.renan@gmail.com", "login"=>"WlademirRenan", "avatar_url"=>"https://avatars2.githubusercontent.com/u/16175543?v=4", "quantidade"=>2}]
+    expect(retorno).to eq [{"name"=>"Wlademir Renan dos Santos", "email"=>["wlademir.renan@gmail.com", "wlademir.renan@gmail.com"], "login"=>"WlademirRenan", "avatar_url"=>"https://avatars2.githubusercontent.com/u/16175543?v=4", "quantidade"=>2}]
   end
 
   it 'deve gerar arquivo com commits classificados' do
-    commits = [{"name"=>"Wlademir Renan dos Santos", "email"=>"wlademir.renan@gmail.com", "login"=>"WlademirRenan", "avatar_url"=>"https://avatars2.githubusercontent.com/u/16175543?v=4", "quantidade"=>2}]
+    commits = [{"name"=>"Wlademir Renan dos Santos", "email"=>["wlademir.renan@gmail.com"], "login"=>"WlademirRenan", "avatar_url"=>"https://avatars2.githubusercontent.com/u/16175543?v=4", "quantidade"=>2}]
     @interface.gerar_arquivo(commits, 'teste')
     expect(File.exist?("arquivos/teste_#{@interface.data_hora_f}.txt")).to eq true
   end
